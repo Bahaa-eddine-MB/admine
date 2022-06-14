@@ -10,6 +10,8 @@ Future<void> main() async {
         appId: "1:236121457754:web:0376549f83f124ed150463",
         messagingSenderId: "236121457754",
         projectId: "doctel-65452",
+        storageBucket: "doctel-65452.appspot.com",
+
   ));
   runApp(const LoginDoctell());
 }
