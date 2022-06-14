@@ -1,10 +1,12 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:page_admin/pages/Widgets/Doctors.dart';
 import '../../model/doctors.dart';
-
+import 'package:http/http.dart' as http;
 
 class DoctorCard extends StatefulWidget {
   final Doctor doc;
@@ -15,7 +17,37 @@ class DoctorCard extends StatefulWidget {
 }
 
 class _DoctorCardState extends State<DoctorCard> {
- 
+  Future sendEmail({
+    required String name,
+    required String email,
+    required String subject,
+    required String message,
+  }) async {
+    final serviceId = 'service_3kw6abl';
+    final templateId = 'template_tob5xuj';
+    final userId = '2B6983MMP0B4nUe8r';
+
+    final url = Uri.parse('https://api.emailjs.com/api/v1.0/email/send');
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({
+        'service_id': serviceId,
+        'template_id': templateId,
+        'user_id': userId,
+        'template_params': {
+          'user_name': name,
+          'user_email': email,
+          'user_subject': subject,
+          'user_message': message,
+        }
+      }),
+    );
+    print("yeeeeeeeeeeeeeeeeeeeeeeeeeees");
+  }
+
   get doc => doc;
   showLoading(context) {
     return showDialog(
@@ -168,8 +200,15 @@ class _DoctorCardState extends State<DoctorCard> {
                                                         .update({
                                                       "isAccepted": true,
                                                     });
-                                                   
-                                                   
+                                                    sendEmail(
+                                                        name: "Dr." +
+                                                            widget.doc
+                                                                .nameofthedoctor,
+                                                        email:
+                                                            "be.bahaaeddine@gmail.com",
+                                                        subject:
+                                                            "DocTel team : replay",
+                                                        message: "teeeeeeest");
                                                     Navigator.of(context).pop();
 
                                                     Navigator.of(context).pop();
@@ -203,12 +242,59 @@ class _DoctorCardState extends State<DoctorCard> {
                               ElevatedButton(
                                   onPressed: () async {
                                     //TODO: Put the code in case the doctor is REFUSED here
-                                    await FirebaseFirestore.instance
-                                        .collection("Docuser")
-                                        .doc(widget.doc.uid)
-                                        .update({
-                                      "isAccepted": false,
-                                    });
+                                    print(widget.doc.nameofthedoctor);
+                                    showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            title: Text("Confirmation:"),
+                                            content: Text(
+                                                "Do you want to refuse this doctor?"),
+                                            actions: [
+                                              TextButton(
+                                                  onPressed: () {
+                                                    Navigator.of(context).pop();
+                                                  },
+                                                  child: Text("CANCEL")),
+                                              TextButton(
+                                                  onPressed: () async {
+                                                    showLoading(context);
+
+                                                    var notref =
+                                                        FirebaseFirestore
+                                                            .instance
+                                                            .collection(
+                                                                'Docuser');
+                                                    notref
+                                                        .where('owner',
+                                                            isEqualTo: widget
+                                                                .doc.uid)
+                                                        .get()
+                                                        .then((value) {
+                                                      for (var element
+                                                          in value.docs) {
+                                                        notref
+                                                            .doc(element.id)
+                                                            .delete();
+                                                      }
+                                                    });
+                                                    sendEmail(
+                                                        name: "Dr." +
+                                                            widget.doc
+                                                                .nameofthedoctor,
+                                                        email:
+                                                            "be.bahaaeddine@gmail.com",
+                                                        subject:
+                                                            "DocTel team : replay",
+                                                        message: "teeeeeeest");
+                                                    Navigator.of(context).pop();
+
+                                                    Navigator.of(context).pop();
+                                                  },
+                                                  child: Text("SUBMIT"))
+                                            ],
+                                          );
+                                        });
                                   },
                                   style: ButtonStyle(
                                     backgroundColor:

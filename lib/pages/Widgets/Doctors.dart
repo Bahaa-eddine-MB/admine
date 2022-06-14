@@ -8,9 +8,11 @@ class Doctor {
   late String telephone;
   late String urlpic;
     late String uid;
+        late String email;
 
 
-  Doctor(this.nameofthedoctor,this.telephone,this.categorie, this.place,this.urlpic,this.uid);
+
+  Doctor(this.nameofthedoctor,this.telephone,this.categorie, this.place,this.urlpic,this.uid,this.email);
 
 
 }

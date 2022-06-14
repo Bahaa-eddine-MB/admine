@@ -2,6 +2,8 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -23,6 +25,7 @@ class AdminPage extends StatefulWidget {
 class _AdminPageState extends State<AdminPage> {
   Uint8List webImage = Uint8List(8);
   bool imageAvailable = false;
+  TextEditingController catController = TextEditingController();
   Future<void> pickImage() async {
     /*final image = await ImagePickerWeb.getImageAsBytes();
     setState(() {
@@ -44,9 +47,11 @@ class _AdminPageState extends State<AdminPage> {
 
   @override
   Widget build(BuildContext context) {
-    var doctorsRef =
-        FirebaseFirestore.instance.collection("Docuser").where("isAccepted" ,isEqualTo: false).snapshots();
-      
+    var doctorsRef = FirebaseFirestore.instance
+        .collection("Docuser")
+        .where("isAccepted", isEqualTo: false)
+        .snapshots();
+
     final double h = MediaQuery.of(context).size.height;
     final double w = MediaQuery.of(context).size.width;
     return Scaffold(
@@ -92,7 +97,7 @@ class _AdminPageState extends State<AdminPage> {
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30)),
                         actions: [
-                          TextField(
+                          TextField(controller: catController,
                               decoration: InputDecoration(
                                   labelText: "Name of category",
                                   //labelStyle: TextStyle(color: Colors.black54),
@@ -151,7 +156,7 @@ class _AdminPageState extends State<AdminPage> {
                           ),
                           Center(
                               child: ElevatedButton(
-                            onPressed: () {},
+                            onPressed: () {uploadNewCate();},
                             child: Text(
                               'Confirm',
                               style: TextStyle(fontFamily: 'Montserrat'),
@@ -240,6 +245,7 @@ class _AdminPageState extends State<AdminPage> {
                       "${snapshot.data!.docs[index]['wilaya']}",
                       snapshot.data!.docs[index]['picture'],
                       snapshot.data!.docs[index]['owner'],
+                      snapshot.data!.docs[index]['email'],
                     ));
                   },
                 );
@@ -251,5 +257,27 @@ class _AdminPageState extends State<AdminPage> {
         ],
       ),
     );
+  }
+  PlatformFile? pickedFile;
+  UploadTask? uploadTask;
+  uploadNewCate() async {
+    try {
+      var path = 'admin/${webImage}';
+      var file = File('$webImage');
+      final ref = FirebaseStorage.instance.ref().child(path);
+      uploadTask = ref.putFile(file);
+      final snapshot = await uploadTask!.whenComplete(() {});
+      // The link to the profil image ///////////////////////////////////////////////
+      final urldownload = await snapshot.ref.getDownloadURL();
+      //////////////////////////////////////---------------------URL --------------------------////////////////////////////////////
+      print('Download Link of the profil image: $urldownload');
+
+      await FirebaseFirestore.instance
+          .collection('Specialities')
+          .add({'spec': catController.text, 'specpicture': urldownload});
+    } catch (e) {
+      print(e);
+      print('/*/*/*/*/*/*/*/');
+    }
   }
 }
