@@ -23,7 +23,7 @@ class _DoctorCardState extends State<DoctorCard> {
     required String subject,
     required String message,
   }) async {
-    final serviceId = 'service_3kw6abl';
+    final serviceId = 'service_84c3qe6';
     final templateId = 'template_tob5xuj';
     final userId = '2B6983MMP0B4nUe8r';
 
@@ -201,14 +201,15 @@ class _DoctorCardState extends State<DoctorCard> {
                                                       "isAccepted": true,
                                                     });
                                                     sendEmail(
-                                                        name: "Dr." +
+                                                        name: 
                                                             widget.doc
                                                                 .nameofthedoctor,
                                                         email:
-                                                            "be.bahaaeddine@gmail.com",
+                                                           widget.doc
+                                                                .email,
                                                         subject:
                                                             "DocTel team : replay",
-                                                        message: "teeeeeeest");
+                                                        message: "You have been accepted to our application\nYou have the access now to doctel!");
                                                     Navigator.of(context).pop();
 
                                                     Navigator.of(context).pop();
@@ -278,15 +279,16 @@ class _DoctorCardState extends State<DoctorCard> {
                                                             .delete();
                                                       }
                                                     });
-                                                    sendEmail(
-                                                        name: "Dr." +
+                                                     sendEmail(
+                                                        name: 
                                                             widget.doc
                                                                 .nameofthedoctor,
                                                         email:
-                                                            "be.bahaaeddine@gmail.com",
+                                                           widget.doc
+                                                                .email,
                                                         subject:
                                                             "DocTel team : replay",
-                                                        message: "teeeeeeest");
+                                                        message: "You have not been accepted to our application unfortunately!");
                                                     Navigator.of(context).pop();
 
                                                     Navigator.of(context).pop();
